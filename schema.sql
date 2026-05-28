@@ -17,6 +17,7 @@ create table public.respaldos (
     cedula varchar(10) not null unique check (cedula ~ '^[0-9]{10}$'),
     provincia varchar(50) not null,
     canton varchar(50) not null, -- Agregada columna de Cantón
+    fecha_nacimiento date not null, -- Agregada fecha de nacimiento
     
     -- Firma manuscrita almacenada en Base64 (formato PNG)
     signature text not null,
@@ -53,7 +54,7 @@ returns trigger as $$
 begin
     new.system_hash := encode(
         digest(
-            concat(new.cedula, '|', new.fullname, '|', new.provincia, '|', new.canton, '|', substring(new.signature from 1 for 100), '|', new.created_at::text),
+            concat(new.cedula, '|', new.fullname, '|', new.provincia, '|', new.canton, '|', new.fecha_nacimiento::text, '|', substring(new.signature from 1 for 100), '|', new.created_at::text),
             'sha256'
         ),
         'hex'

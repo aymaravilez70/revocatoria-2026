@@ -13,6 +13,7 @@ const totalSupportsCount = ref(0)
 const form = reactive({
   fullname: '',
   cedula: '',
+  fechaNacimiento: '',
   provincia: '',
   canton: '', // Agregado campo de cantón
   legalConsent: false
@@ -21,6 +22,7 @@ const form = reactive({
 const errors = reactive({
   fullname: '',
   cedula: '',
+  fechaNacimiento: '',
   provincia: '',
   canton: '', // Agregado error de cantón
   signature: '',
@@ -310,6 +312,27 @@ async function goToStep2() {
     errors.cedula = ''
   }
   
+  // 2.5 Fecha de Nacimiento
+  const dobVal = form.fechaNacimiento
+  if (!dobVal) {
+    errors.fechaNacimiento = 'La fecha de nacimiento es obligatoria.'
+    hasErrors = true
+  } else {
+    const dobDate = new Date(dobVal)
+    const today = new Date()
+    let age = today.getFullYear() - dobDate.getFullYear()
+    const m = today.getMonth() - dobDate.getMonth()
+    if (m < 0 || (m === 0 && today.getDate() < dobDate.getDate())) {
+      age--
+    }
+    if (age < 18) {
+      errors.fechaNacimiento = 'Debe ser mayor de edad (18 años o más) para registrar su adhesión.'
+      hasErrors = true
+    } else {
+      errors.fechaNacimiento = ''
+    }
+  }
+  
   // 3. Provincia
   if (!form.provincia) {
     errors.provincia = 'Debe seleccionar su provincia de registro electoral.'
@@ -396,6 +419,7 @@ async function submitRespaldo() {
     const payload = {
       fullname: form.fullname.trim().toUpperCase(),
       cedula: form.cedula.trim(), // Enviado sin limpiar caracteres no numéricos
+      fecha_nacimiento: form.fechaNacimiento,
       provincia: form.provincia,
       canton: form.canton, // Inclusión de cantón en la inserción
       signature: signatureBase64,
@@ -415,6 +439,7 @@ async function submitRespaldo() {
       id: data.id,
       fullname: data.fullname,
       cedula: data.cedula,
+      fecha_nacimiento: data.fecha_nacimiento,
       provincia: provincias.find(p => p.value === data.provincia)?.label || data.provincia,
       canton: data.canton, // Agregado canton al recibo
       signature: data.signature,
@@ -435,12 +460,14 @@ async function submitRespaldo() {
 function restartFlow() {
   form.fullname = ''
   form.cedula = ''
+  form.fechaNacimiento = ''
   form.provincia = ''
   form.canton = ''
   form.legalConsent = false
   
   errors.fullname = ''
   errors.cedula = ''
+  errors.fechaNacimiento = ''
   errors.provincia = ''
   errors.canton = ''
   errors.signature = ''
@@ -629,7 +656,7 @@ function restartFlow() {
                 <p v-if="errors.fullname" class="text-xs text-red-600 mt-1 font-medium">{{ errors.fullname }}</p>
               </div>
 
-              <!-- Cédula -->
+              <!-- Cédula y Fecha de Nacimiento -->
               <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                   <label for="cedula" class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5 flex justify-between">
@@ -649,6 +676,24 @@ function restartFlow() {
                     </div>
                   </div>
                   <p v-if="errors.cedula" class="text-xs text-red-600 mt-1 font-medium">{{ errors.cedula }}</p>
+                </div>
+
+                <div>
+                  <label for="fecha_nacimiento" class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5 flex justify-between">
+                    <span>Fecha de Nacimiento <span class="text-red-500">*</span></span>
+                    <span class="text-[10px] text-slate-400 font-normal">Mayor de 18 años</span>
+                  </label>
+                  <div class="relative">
+                    <input type="date" id="fecha_nacimiento" v-model="form.fechaNacimiento" required
+                           class="w-full px-4 py-3 border border-slate-300 rounded-lg text-slate-850 focus:outline-none focus:ring-2 focus:ring-slate-850 focus:border-slate-850 transition-all pl-10"
+                           :class="{ 'border-red-500 focus:ring-red-500': errors.fechaNacimiento }">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <p v-if="errors.fechaNacimiento" class="text-xs text-red-600 mt-1 font-medium">{{ errors.fechaNacimiento }}</p>
                 </div>
               </div>
 
@@ -970,6 +1015,10 @@ function restartFlow() {
           <div>
             <span class="text-[10px] font-bold text-slate-400 uppercase block">Cantón</span>
             <span class="text-xs font-bold text-slate-800">{{ receipt.canton.toUpperCase() }}</span>
+          </div>
+          <div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase block">Fecha de Nacimiento</span>
+            <span class="text-xs font-bold text-slate-800">{{ receipt.fecha_nacimiento }}</span>
           </div>
           <div>
             <span class="text-[10px] font-bold text-slate-400 uppercase block">Estado del Trámite</span>
