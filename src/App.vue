@@ -455,18 +455,7 @@ function restartFlow() {
 </script>
 
 <template>
-  <!-- BARRA SUPERIOR DE AUDITORÍA -->
-  <div class="bg-slate-900 text-white text-xs py-1 px-4 flex justify-between items-center border-b border-slate-800 no-print">
-    <div class="flex items-center space-x-4">
-      <span class="flex items-center space-x-1">
-        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-        <span class="font-medium text-slate-300">Servidores Supabase Activos</span>
-      </span>
-      <span class="hidden md:inline text-slate-500">|</span>
-      <span class="hidden md:inline text-slate-400">Canal Seguro Cifrado SSL</span>
-    </div>
 
-  </div>
 
   <!-- HEADER PRINCIPAL -->
   <header class="bg-white border-b border-slate-200 shadow-xs sticky top-0 z-40 no-print">
