@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+/* Estilos de personalización del sistema electoral */
+body {
+  background-color: #F8FAFC; /* Slate 50 */
+}
+
+/* Reglas de impresión física/PDF del comprobante */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  
+  #receipt-printable-area, #receipt-printable-area * {
+    visibility: visible;
+  }
+  
+  #receipt-printable-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  
+  .no-print {
+    display: none !important;
+  }
+}
